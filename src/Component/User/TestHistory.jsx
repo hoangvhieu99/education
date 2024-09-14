@@ -138,10 +138,7 @@ export default function TestHistory() {
   const { user, render, onSetRender } = useContext(UserContext);
   const [dataSource, setDataSource] = useState("");
   const [subjectList, setSubjectList] = useState([]);
-  const [selectedOption, setSelectedOption] = useState({
-    subjectName: "",
-  });
-  console.log(selectedOption);
+  
   console.log(dataSource);
   const pagination = {
     pageSize: 5,
@@ -208,57 +205,27 @@ export default function TestHistory() {
   //#endregion
 
   //#region - Function - Nhận giá trị select option
-  const handleOnChange = (name, value) => {
-    setSelectedOption((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  
-    // Gọi hàm để lọc hoặc hiển thị dữ liệu trong bảng
-    const filteredData = dataSource.filter((item) =>
-      value === "Tất cả các môn" ? true : item.subjectName === value
-    );
-    
-    setDataSource(filteredData); // Giả sử bạn có state để cập nhật dữ liệu table
-  };
-  // const handleOnChange = async (name, value) => {
-  //   setSelectOption({
-  //     [name]: value,
-  //   });
-  //   try {
-  //     const result = await StatictisService(user.accountId, value);
-  //     if (result.status === 400) {
-  //       setDataSource(result.data);
-  //       setDataChart([
-  //         {
-  //           sex: "Understood",
-  //           sold: 0,
-  //         },
-  //         {
-  //           sex: "NotUnderstood",
-  //           sold: 100,
-  //         },
-  //       ]);
-  //     }
-  //     if (result.status === 200) {
-  //       setDataSource(result.data);
-  //       setDataChart([
-  //         {
-  //           sex: "Understood",
-  //           sold: result.levelOfUnderStanding,
-  //         },
-  //         {
-  //           sex: "NotUnderstood",
-  //           sold: Number(100 - result.levelOfUnderStanding),
-  //         },
-  //       ]);
-  //       onSetRender();
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching testdetail service:", error);
-  //   }
-  // };
+  const [filteredData, setFilteredData] = useState(dataSource);
+  const [selectedOption, setSelectedOption] = useState({
+    subjectName: 'Tất cả các môn',
+  });
+  useEffect(() => {
+    if (selectedOption.subjectName === 'Tất cả các môn') {
+      setFilteredData(dataSource);
+    }
+  }, [selectedOption.subjectName, dataSource]);
 
+  const handleSelectChange = (value) => {
+    setSelectedOption({ subjectName: value });
+
+    if (value === 'Tất cả các môn') {
+      setFilteredData(dataSource);  // Hiển thị tất cả khi chọn "Tất cả các môn"
+    } else {
+      const filtered = dataSource.filter(item => item.subjectName === value);
+      setFilteredData(filtered);
+    }
+  };
+  
   //#endregion
 
   //#region - Function - Hiển thị chart
@@ -298,7 +265,6 @@ export default function TestHistory() {
   };
 
   //#endregion
-
   return (
     <>
       <Header />
@@ -318,12 +284,16 @@ export default function TestHistory() {
                   width: "100%",
                 }}
                 defaultValue="Tất cả các môn"
-                name="subjectId"
+                // name="subjectId"
+                // value={selectedOption.subjectId}
+                // onChange={(e) => handleOnChange("subjectName", e)}
                 allowClear
-                onChange={(e) => handleOnChange("subjectName", e)}
-                value={selectedOption.subjectId}
+                onChange={handleSelectChange}
+                 name="subjectName"
+                value={selectedOption.subjectName}
               >
-                <Option value="Tất cả các môn" key="all" name="all"></Option>
+               <Option value="Tất cả các môn" key="all">Tất cả các môn</Option>
+                {/* <Option value="Tất cả các môn" key="all" name="all"></Option> */}
                 {subjectList?.map((item) => (
                   <Option
                     value={item.subjectName}
@@ -388,7 +358,7 @@ export default function TestHistory() {
               className="text-black"
               style={{ color: "red" }}
               columns={columns}
-              dataSource={dataSource}
+              dataSource={filteredData}
               pagination={pagination}
             />
           </div>

@@ -102,6 +102,20 @@ export default function TestHistory() {
       },
     },
     {
+      title: "Số câu",
+      width: 50,
+      dataIndex: "totalQuestion",
+      key: 1,
+      fixed: "left",
+    },
+    {
+      title: "Khối",
+      width: 50,
+      dataIndex: ['grade', 'nameGrade'],
+      key: 1,
+      fixed: "left",
+    },
+    {
       title: "Kết quả",
       width: 50,
       dataIndex: "score",
@@ -138,8 +152,11 @@ export default function TestHistory() {
   const { user, render, onSetRender } = useContext(UserContext);
   const [dataSource, setDataSource] = useState("");
   const [subjectList, setSubjectList] = useState([]);
-  
-  console.log(dataSource);
+  const [selectedOption, setSelectedOption] = useState({
+    subjectName: "",
+  });
+  // console.log(selectedOption);
+  // console.log(dataSource);
   const pagination = {
     pageSize: 5,
     total: dataSource != null ? dataSource.length : "",
@@ -160,17 +177,22 @@ export default function TestHistory() {
   const handleViewTestDetails = async () => {
     try {
       const result = await GetTestDetailService(user.accountId);
-      debugger;
+      console.log(result.data)
+      const totalScore = result.data.reduce((sum, item) => sum + item.score, 0);
+      const diemtrungbinh = ((totalScore /result.data.length)*10)
+      const diemTrungBinhHinhTron = parseFloat(diemtrungbinh.toFixed(2));
+      console.log("Total Score:", totalScore);
       if (result.status === 200) {
         setDataSource(result.data);
+        
         setDataChart([
           {
             sex: "Understood",
-            sold: result.levelOfUnderStanding,
+            sold: diemTrungBinhHinhTron ,
           },
           {
             sex: "NotUnderstood",
-            sold: Number(100 - result.levelOfUnderStanding),
+            sold: Number(100 - diemTrungBinhHinhTron),
           },
         ]);
         onSetRender();
@@ -205,27 +227,87 @@ export default function TestHistory() {
   //#endregion
 
   //#region - Function - Nhận giá trị select option
-  const [filteredData, setFilteredData] = useState(dataSource);
-  const [selectedOption, setSelectedOption] = useState({
-    subjectName: 'Tất cả các môn',
-  });
-  useEffect(() => {
-    if (selectedOption.subjectName === 'Tất cả các môn') {
-      setFilteredData(dataSource);
-    }
-  }, [selectedOption.subjectName, dataSource]);
+  const handleOnChange = async (name, value) => {
+      const result = await GetTestDetailService(user.accountId);
+      var data = result.data;
+      console.log(data)
+    
+      // setSelectedOption((prevState) => ({
+      //   ...prevState,
+      //   [name]: value,
+      // }));
+    const statictis = await StatictisService(user.accountId, value);
+    console.log(statictis)
+    setDataSource(statictis.data);
+   
+    // Gọi hàm để lọc hoặc hiển thị dữ liệu trong bảng
+    console.log(dataSource)
+    let filteredData;
+    if (value === "Tất cả các môn") {
 
-  const handleSelectChange = (value) => {
-    setSelectedOption({ subjectName: value });
-
-    if (value === 'Tất cả các môn') {
-      setFilteredData(dataSource);  // Hiển thị tất cả khi chọn "Tất cả các môn"
-    } else {
-      const filtered = dataSource.filter(item => item.subjectName === value);
-      setFilteredData(filtered);
+      filteredData = data;
+      console.log(filteredData)
+    } 
+    else {
+      filteredData = data.filter((item) => item.subjectName === value);
+      const totalScore = filteredData.reduce((sum, item) => sum + item.score, 0);
+      const diemtrungbinh = ((totalScore /filteredData.length)*10)
+      const diemTrungBinhHinhTron = parseFloat(diemtrungbinh.toFixed(2));
+      console.log(diemtrungbinh)
+      setDataChart([
+        {
+          sex: "Understood",
+          sold: diemTrungBinhHinhTron,
+        },
+        {
+          sex: "NotUnderstood",
+          sold: Number(100 - diemTrungBinhHinhTron),
+        },
+      ]);
+      onSetRender();
     }
+
+    setDataSource(filteredData)
   };
-  
+  // const handleOnChange = async (name, value) => {
+  //   setSelectedOption((prevState) => ({
+  //     ...prevState,
+  //     [name]: value,
+  //   }));
+  //   try {
+  //     const result = await StatictisService(user.accountId, value);
+  //     if (result.status === 400) {
+  //       setDataSource(result.data);
+  //       setDataChart([
+  //         {
+  //           sex: "Understood",
+  //           sold: 0,
+  //         },
+  //         {
+  //           sex: "NotUnderstood",
+  //           sold: 100,
+  //         },
+  //       ]);
+  //     }
+  //     if (result.status === 200) {
+  //       setDataSource(result.data);
+  //       setDataChart([
+  //         {
+  //           sex: "Understood",
+  //           sold: result.levelOfUnderStanding,
+  //         },
+  //         {
+  //           sex: "NotUnderstood",
+  //           sold: Number(100 - result.levelOfUnderStanding),
+  //         },
+  //       ]);
+  //       onSetRender();
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching testdetail service:", error);
+  //   }
+  // };
+
   //#endregion
 
   //#region - Function - Hiển thị chart
@@ -265,6 +347,7 @@ export default function TestHistory() {
   };
 
   //#endregion
+
   return (
     <>
       <Header />
@@ -284,16 +367,12 @@ export default function TestHistory() {
                   width: "100%",
                 }}
                 defaultValue="Tất cả các môn"
-                // name="subjectId"
-                // value={selectedOption.subjectId}
-                // onChange={(e) => handleOnChange("subjectName", e)}
+                name="subjectId"
                 allowClear
-                onChange={handleSelectChange}
-                 name="subjectName"
-                value={selectedOption.subjectName}
+                onChange={(e) => handleOnChange("subjectName", e)}
+                value={selectedOption.subjectId}
               >
-               <Option value="Tất cả các môn" key="all">Tất cả các môn</Option>
-                {/* <Option value="Tất cả các môn" key="all" name="all"></Option> */}
+                <Option value="Tất cả các môn" key="all" name="all"></Option>
                 {subjectList?.map((item) => (
                   <Option
                     value={item.subjectName}
@@ -358,7 +437,7 @@ export default function TestHistory() {
               className="text-black"
               style={{ color: "red" }}
               columns={columns}
-              dataSource={filteredData}
+              dataSource={dataSource}
               pagination={pagination}
             />
           </div>

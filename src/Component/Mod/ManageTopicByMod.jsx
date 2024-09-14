@@ -33,7 +33,6 @@ import { UpdateTopicService } from "../../services/topicService";
 import FormItem from "antd/es/form/FormItem";
 import dayjs from "dayjs";
 import "../../assets/Admin.css";
-import { toast } from "react-toastify";
 const { Content } = Layout;
 const { RangePicker } = DatePicker;
 
@@ -528,6 +527,8 @@ export default function ManageTopicByMod() {
       editStartDate: record.beginTestDate,
       editEndDate: record.endTestDate,
     });
+    // console.log(record.beginTestDate);
+    // console.log(dayjs(record.beginTestDate, dayFormat));
 
     setShowEditForm(true);
   };
@@ -549,6 +550,7 @@ export default function ManageTopicByMod() {
 
   const handleSubmitEdit = async () => {
     let errors = {};
+    handleValidationUpdateTopic(editData, errors);
     if (Object.keys(errors).length === 0) {
       const data = {
         topicId: editData.editTopicId,
@@ -570,19 +572,17 @@ export default function ManageTopicByMod() {
             : null,
       };
       const result = await UpdateTopicService(data);
-      console.log(result);
       if (result.status === 200) {
         handleGetAllTopic();
         setErrors([]);
         setShowEditForm(false);
         setEditData("");
-        toast.success("Chỉnh sửa thành công")
+        openNotificationUpdate200("topRight");
       } else {
-        toast.error("Chỉnh sửa thất bại")
+        openNotificationChangeStatus400("topRight");
       }
     } else {
       setErrors(errors);
-      toast.error("Chỉnh sửa thất bại")
     }
   };
   //#endregion
@@ -708,9 +708,9 @@ export default function ManageTopicByMod() {
                         onChange={handleCreateInputChange}
                       >
                         <option value="Chọn lớp">Chọn lớp</option>
-                        <option value="1">10</option>
-                        <option value="2">11</option>
-                        <option value="3">12</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
                       </select>
                       {errors.createGrade && (
                         <div
@@ -855,7 +855,6 @@ export default function ManageTopicByMod() {
                   <Form.Item>
                     <label>Lớp</label>
                     <select
-                      defaultValue={editData.editGrade}
                       name="editGrade"
                       value={editData.editGrade}
                       allowclear
@@ -863,9 +862,9 @@ export default function ManageTopicByMod() {
                       onChange={handleEditInputChange}
                     >
                       <option value="Chọn lớp">Chọn lớp</option>
-                      <option value="1">10</option>
-                      <option value="2">11</option>
-                      <option value="3">12</option>
+                      <option value="10">10</option>
+                      <option value="11">11</option>
+                      <option value="12">12</option>
                     </select>
                     {errors.editGrade && (
                       <div

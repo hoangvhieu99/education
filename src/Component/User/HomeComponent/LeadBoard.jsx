@@ -96,7 +96,6 @@ export default function LeadBoard({ isColumn }) {
             className={`sc-dlfnbm sc-eCssSg ${isColumn ? "" : "dcHHcO"}  oDHHe`}
           >
             <div className="sc-aemoO hgHGyw">
-              {isColumn ? (
                 <div className="container-ranking">
                   <div id="header">{/* <h1>Ranking</h1> */}</div>
                   <div id="leaderboard">
@@ -104,9 +103,9 @@ export default function LeadBoard({ isColumn }) {
                     <table>
                       <tr>
                         <td class="number pt-0 pb-0">1</td>
-                        <td class="name p-0">Nguyễn Bảo Trân</td>
+                        <td class="name p-0">{ranking[0]?.fullName}</td>
                         <td class="points p-0">
-                          258.244{" "}
+                          {ranking[0]?.score}
                           <img
                             class="gold-medal"
                             src="https://github.com/malunaridev/Challenges-iCodeThis/blob/master/4-leaderboard/assets/gold-medal.png?raw=true"
@@ -127,7 +126,6 @@ export default function LeadBoard({ isColumn }) {
                     </table>
                   </div>
                 </div>
-              ) : (
                 <div className="sc-jONnTn jIvnOH">
                   <p
                     class="sc-eLgOdN ejJoEn d-sm-inline-block d-none"
@@ -228,7 +226,6 @@ export default function LeadBoard({ isColumn }) {
                     </div>
                   </div>
                 </div>
-              )}
             </div>
           </div>
 

@@ -51,13 +51,6 @@ import axios from "axios";
 import Sider from "antd/es/layout/Sider";
 import { AddQuestionByExcelService } from "../../services/questionService";
 import "../../assets/Admin.css";
-import {
-  AddQuestionInCourseChapterByTopic,
-  GetAllChapterService,
-  GetQuestionByCourseChaptersInUser,
-} from "../../services/chapterService";
-import { useCookies } from "react-cookie";
-import { toast } from "react-toastify";
 
 const { Content } = Layout;
 
@@ -157,164 +150,171 @@ export default function ManageQuestionByMod() {
     total: dataSource != null ? dataSource.length : "",
   };
   const { user, render, onSetRender } = useContext(UserContext);
-  const columns = [
-    {
-      title: "ID",
-      width: 70,
-      dataIndex: "questionId",
-      key: 1,
-      fixed: "left",
-    },
-    // {
-    //   title: "Môn học",
-    //   width: 170,
-    //   dataIndex: "subjectName",
-    //   key: 2,
-    //   fixed: "left",
-    // },
-    {
-      title: "Nội dung",
-      width: 350,
-      dataIndex: "questionContent",
-      key: 3,
-      fixed: "left",
-      render: (record) => {
-        return (
-          <td
-            style={{
-              width: "450px",
-              maxWidth: "450px",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
-          >
-            <style>
-              {`
-                                td p:not([class]):not([id]) {
-                                margin: 0;
-                                }
-                            `}
-            </style>
-            <div dangerouslySetInnerHTML={{ __html: record }} />
-          </td>
-        );
-      },
-      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => {
-        return (
-          <Input
-            autoFocus
-            placeholder="Nhập nội dung câu hỏi"
-            value={selectedKeys[0]}
-            onChange={(e) => {
-              setSelectedKeys(e.target.value ? [e.target.value] : []);
-            }}
-            onPressEnter={() => {
-              confirm();
-            }}
-            onBlur={() => {
-              confirm();
-            }}
-          ></Input>
-        );
-      },
-      filterIcon: () => {
-        return <SearchOutlined />;
-      },
-      onFilter: (value, record) => {
-        if (record.questionContent != null) {
-          return record.questionContent
-            .toLowerCase()
-            .includes(value.toLowerCase());
-        }
-      },
-    },
-    {
-      title: "Cấp độ",
-      dataIndex: "level",
-      key: 4,
-      width: 100,
-      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => {
-        return (
-          <Input
-            autoFocus
-            placeholder="Nhập cấp độ"
-            value={selectedKeys[0]}
-            onChange={(e) => {
-              setSelectedKeys(e.target.value ? [e.target.value] : []);
-            }}
-            onPressEnter={() => {
-              confirm();
-            }}
-            onBlur={() => {
-              confirm();
-            }}
-          ></Input>
-        );
-      },
-      filterIcon: () => {
-        return <SearchOutlined />;
-      },
-      onFilter: (value, record) => {
-        if (record.level != null) {
-          return record.level.toLowerCase().includes(value.toLowerCase());
-        }
-      },
-    },
-    {
-      title: "Người tạo",
-      width: 100,
-      dataIndex: "accountName",
-      key: 1,
-      fixed: "left",
-      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => {
-        return (
-          <Input
-            autoFocus
-            placeholder="Nhập người tạo"
-            value={selectedKeys[0]}
-            onChange={(e) => {
-              setSelectedKeys(e.target.value ? [e.target.value] : []);
-            }}
-            onPressEnter={() => {
-              confirm();
-            }}
-            onBlur={() => {
-              confirm();
-            }}
-          ></Input>
-        );
-      },
-      filterIcon: () => {
-        return <SearchOutlined />;
-      },
-      onFilter: (value, record) => {
-        if (record.accountName != null) {
-          return record.accountName.toLowerCase().includes(value.toLowerCase());
-        }
-      },
-    },
-    {
-      title: "Điều hướng",
-      width: 100,
-      key: 1,
-      fixed: "left",
-      render: (record) => {
-        return (
-          <>
-            <Button
-              onClick={() => {
-                handleCheckImageNull(record.image);
-                handleViewEdit(record);
-              }}
-              type="primary"
-              icon={<EditOutlined />}
-            ></Button>{" "}
-          </>
-        );
-      },
-    },
-  ];
+  // const columns = [
+  //   {
+  //     title: "ID",
+  //     width: 70,
+  //     dataIndex: "questionId",
+  //     key: 1,
+  //     fixed: "left",
+  //   },
+  //   {
+  //     title: "Môn học",
+  //     width: 170,
+  //     dataIndex: "subjectName",
+  //     key: 2,
+  //     fixed: "left",
+  //   },
+  //   {
+  //     title: "Nội dung",
+  //     width: 350,
+  //     dataIndex: "questionContent",
+  //     key: 3,
+  //     fixed: "left",
+  //     render: (record) => {
+  //       return (
+  //         <td
+  //           style={{
+  //             width: "450px",
+  //             maxWidth: "450px",
+  //             overflow: "hidden",
+  //             textOverflow: "ellipsis",
+  //             whiteSpace: "nowrap",
+  //           }}
+  //         >
+  //           <style>
+  //             {`
+  //                               td p:not([class]):not([id]) {
+  //                               margin: 0;
+  //                               }
+  //                           `}
+  //           </style>
+  //           <div dangerouslySetInnerHTML={{ __html: record }} />
+  //         </td>
+  //       );
+  //     },
+  //     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => {
+  //       return (
+  //         <Input
+  //           autoFocus
+  //           placeholder="Nhập nội dung câu hỏi"
+  //           value={selectedKeys[0]}
+  //           onChange={(e) => {
+  //             setSelectedKeys(e.target.value ? [e.target.value] : []);
+  //           }}
+  //           onPressEnter={() => {
+  //             confirm();
+  //           }}
+  //           onBlur={() => {
+  //             confirm();
+  //           }}
+  //         ></Input>
+  //       );
+  //     },
+  //     filterIcon: () => {
+  //       return <SearchOutlined />;
+  //     },
+  //     onFilter: (value, record) => {
+  //       if (record.questionContent != null) {
+  //         return record.questionContent
+  //           .toLowerCase()
+  //           .includes(value.toLowerCase());
+  //       }
+  //     },
+  //   },
+  //   {
+  //     title: "Cấp độ",
+  //     dataIndex: "level",
+  //     key: 4,
+  //     width: 100,
+  //     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => {
+  //       return (
+  //         <Input
+  //           autoFocus
+  //           placeholder="Nhập cấp độ"
+  //           value={selectedKeys[0]}
+  //           onChange={(e) => {
+  //             setSelectedKeys(e.target.value ? [e.target.value] : []);
+  //           }}
+  //           onPressEnter={() => {
+  //             confirm();
+  //           }}
+  //           onBlur={() => {
+  //             confirm();
+  //           }}
+  //         ></Input>
+  //       );
+  //     },
+  //     filterIcon: () => {
+  //       return <SearchOutlined />;
+  //     },
+  //     onFilter: (value, record) => {
+  //       if (record.level != null) {
+  //         return record.level.toLowerCase().includes(value.toLowerCase());
+  //       }
+  //     },
+  //   },
+  //   {
+  //     title: "Người tạo",
+  //     width: 100,
+  //     dataIndex: "accountName",
+  //     key: 1,
+  //     fixed: "left",
+  //     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => {
+  //       return (
+  //         <Input
+  //           autoFocus
+  //           placeholder="Nhập người tạo"
+  //           value={selectedKeys[0]}
+  //           onChange={(e) => {
+  //             setSelectedKeys(e.target.value ? [e.target.value] : []);
+  //           }}
+  //           onPressEnter={() => {
+  //             confirm();
+  //           }}
+  //           onBlur={() => {
+  //             confirm();
+  //           }}
+  //         ></Input>
+  //       );
+  //     },
+  //     filterIcon: () => {
+  //       return <SearchOutlined />;
+  //     },
+  //     onFilter: (value, record) => {
+  //       if (record.accountName != null) {
+  //         return record.accountName.toLowerCase().includes(value.toLowerCase());
+  //       }
+  //     },
+  //   },
+  //   {
+  //     title: "Trạng thái",
+  //     width: 100,
+  //     dataIndex: "statusString",
+  //     key: 1,
+  //     fixed: "left",
+  //   },
+  //   {
+  //     title: "Điều hướng",
+  //     width: 100,
+  //     key: 1,
+  //     fixed: "left",
+  //     render: (record) => {
+  //       return (
+  //         <>
+  //           <Button
+  //             onClick={() => {
+  //               handleCheckImageNull(record.image);
+  //               handleViewEdit(record);
+  //             }}
+  //             type="primary"
+  //             icon={<EditOutlined />}
+  //           ></Button>{" "}
+  //         </>
+  //       );
+  //     },
+  //   },
+  // ];
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [topic, setTopic] = useState("");
   const [createData, setCreateData] = useState({
@@ -457,7 +457,6 @@ export default function ManageQuestionByMod() {
   };
   const showModalChapter = () => {
     setIsModalChapterOpen(true);
-    handleGetAllQuestionByChapter();
   };
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -704,100 +703,148 @@ export default function ManageQuestionByMod() {
 
   //#region - Xử lý thêm câu hỏi theo chương
   const [isModalChapterOpen, setIsModalChapterOpen] = useState(false);
+  const [selectedChapter, setSelectedChapter] = useState(null);
   const [questions, setQuestions] = useState([]);
-  const [selectedChapterId, setSelectedChapterId] = useState(null);
-  // Câu hỏi trong chương
-  const [dataSourceChapter, setDataSourceChapter] = useState([]);
-  // tất cả chương
-  const [chapter, setChapter] = useState([]);
-  // temp
-  //  const [dataTemp, setDataTemp] = useState([])
-  const handleGetAllQuestionByChapter = async () => {
-    try {
-      const result = await GetAllChapterService();
-      if (result && result.data) {
-        setChapter(result.data);
-      } else {
-        openNotificationGetData400("topRight");
-      }
-    } catch (error) {
-      openNotificationGetData400("topRight");
-    }
-  };
-
-  const handleGetData = async (chapterId) => {
-    try {
-      const result = await GetQuestionByCourseChaptersInUser(chapterId);
-      if (result && result.data) {
-        setDataSourceChapter(result.data);
-      }
-    } catch (error) {
-      console.error("Error fetching mod service:", error);
-    }
-  };
-
   const [selectedQuestions, setSelectedQuestions] = useState([]);
+
+  // DATA MẪU. ĐOẠN NÀY PHẢI GỌI API ĐỂ LẤY DANH SÁCH CHƯƠNG RỒI TRUYỀN VÀO BIẾN chapters này.
+  const chapters = ["Chương 1", "Chương 2", "Chương 3"];
+  // DATA MẪU. ĐOẠN NÀY PHẢI GỌI API ĐỂ LẤY DANH CÂU HỎI THEO CHƯƠNG RỒI TRUYỀN VÀO BIẾN chapterQuestions NÀY. LƯU Ý PHẢI TRUYỀN CẢ IdSubject. và lưu theo id
+  const [dataSourceChapter, setDataSourceChapter] = useState([
+    {
+      key: "1",
+      questionId: "Q01",
+      chapterTitle: "Chương 1",
+      questionContext: "Nội dung câu hỏi 1",
+      userCreated: "User A",
+      levelName: "Dễ",
+    },
+  ]);
+
+  const chapterQuestions = {
+    "Chương 1": [
+      {
+        questionId: "Q01",
+        chapterTitle: "Chương 1",
+        questionContext: "Câu hỏi 1.1",
+        userCreated: "User A",
+        levelName: "Dễ",
+      },
+      {
+        questionId: "Q02",
+        chapterTitle: "Chương 1",
+        questionContext: "Câu hỏi 1.2",
+        userCreated: "User B",
+        levelName: "Trung bình",
+      },
+      {
+        questionId: "Q03",
+        chapterTitle: "Chương 1",
+        questionContext: "Câu hỏi 1.3",
+        userCreated: "User C",
+        levelName: "Khó",
+      },
+    ],
+    "Chương 2": [
+      {
+        questionId: "Q04",
+        chapterTitle: "Chương 2",
+        questionContext: "Câu hỏi 2.1",
+        userCreated: "User D",
+        levelName: "Dễ",
+      },
+      {
+        questionId: "Q05",
+        chapterTitle: "Chương 2",
+        questionContext: "Câu hỏi 2.2",
+        userCreated: "User E",
+        levelName: "Trung bình",
+      },
+      {
+        questionId: "Q06",
+        chapterTitle: "Chương 2",
+        questionContext: "Câu hỏi 2.3",
+        userCreated: "User F",
+        levelName: "Khó",
+      },
+    ],
+  };
+
+  const columns = [
+    {
+      title: "ID Câu hỏi",
+      dataIndex: "questionId",
+      key: "questionId",
+    },
+    {
+      title: "Chương",
+      dataIndex: "chapterTitle",
+      key: "chapterTitle",
+    },
+    {
+      title: "Nội dung câu hỏi",
+      dataIndex: "questionContext",
+      key: "questionContext",
+    },
+    {
+      title: "Người tạo",
+      dataIndex: "userCreated",
+      key: "userCreated",
+    },
+    {
+      title: "Mức độ",
+      dataIndex: "levelName",
+      key: "levelName",
+    },
+  ];
   // Hàm xử lý khi chọn chương
-  const handleChapterChange = (value, option) => {
-    const chapterId = option.key;
-    setSelectedChapterId(option.key);
-    handleGetData(chapterId);
+  const handleChapterChange = (value) => {
+    setSelectedChapter(value);
+    setQuestions(chapterQuestions[value] || []);
   };
 
   // Hàm xử lý khi chọn câu hỏi
-  const handleQuestionChange = (checkedQuestionIds) => {
-    const selectedQuestionIds = selectedQuestions.map(
-      (question) => question.questionId
-    );
-    const removedQuestionIds = checkedQuestionIds.filter(
-      (questionId) => !selectedQuestionIds.includes(questionId)
-    );
-    const filteredQuestionRemoved = selectedQuestionIds.filter(
-      (question) => !removedQuestionIds.includes(question)
-    );
-    const questionIds = [
-      ...new Set([...checkedQuestionIds, ...filteredQuestionRemoved]),
-    ];
-    const questions = dataSourceChapter.filter((question) =>
-      questionIds.includes(question.questionId)
+  const handleQuestionChange = (checkedValues) => {
+    // Tạo một bản sao của selectedQuestions hiện tại, chỉ lưu các object câu hỏi
+    const selectedFullQuestions = checkedValues.map((questionContext) =>
+      questions.find((q) => q.questionContext === questionContext)
     );
 
-    setSelectedQuestions(questions);
+    // Lọc ra các câu hỏi chưa có trong selectedQuestions để tránh trùng lặp
+    const updatedQuestions = [...selectedQuestions];
+    selectedFullQuestions.forEach((question) => {
+      if (
+        question &&
+        !updatedQuestions.some(
+          (q) => q.questionContext === question.questionContext
+        )
+      ) {
+        updatedQuestions.push(question);
+      }
+    });
 
-    //TODO: check untick questionsn
+    setSelectedQuestions(updatedQuestions);
   };
 
   // Hiển thị trong modal chỉ hiện chapterTitle và questionContext
-  const handleOkModalChapter = async () => {
+
+  const handleOkModalChapter = () => {
     // Tạo danh sách các câu hỏi mới dựa trên các câu hỏi đã chọn
     const newQuestions = selectedQuestions.map((question, index) => ({
-      accountId: question.userCreated,
-      topicId: topic.topicId,
-      lstQuestionId:question.questionId
+      key: question.questionId, // Sử dụng questionId làm key duy nhất
+      questionId: question.questionId, // questionId từ dữ liệu
+      chapterTitle: question.chapterTitle, // Chương đã chọn
+      questionContext: question.questionContext, // Nội dung câu hỏi
+      userCreated: question.userCreated, // Người tạo
+      levelName: question.levelName, // Mức độ
     }));
-    // console.log(newQuestions);
-    const dataResult = newQuestions.reduce((acc, current) => {
-      // Nếu lstQuestionId chưa được tạo, thì khởi tạo nó là một mảng
-      if (!acc.lstQuestionId) {
-        acc = { ...current, lstQuestionId: [current.lstQuestionId] };
-      } else {
-        // Thêm giá trị lstQuestionId của đối tượng hiện tại vào mảng
-        acc.lstQuestionId.push(current.lstQuestionId);
-      }
-      return acc;
-    }, {});
-    const result = await AddQuestionInCourseChapterByTopic(dataResult);
-    console.log(result);
-    if (result && result.count >=1) {
-      toast.success("Thêm thành công");
-      handleGetAllQuestionByTopic();
-     
-    }else{
-      toast.error("Thêm thất bại");
-    }
-   
+
+    // Cập nhật dữ liệu bảng bằng cách thêm các câu hỏi mới
+    setDataSourceChapter((prevData) => [...prevData, ...newQuestions]);
+
     // Đóng modal và reset lại các câu hỏi đã chọn
     setIsModalChapterOpen(false);
+    setSelectedQuestions([]);
   };
 
   const handleCancelModalChapter = () => {
@@ -849,7 +896,6 @@ export default function ManageQuestionByMod() {
               <Button type="primary" onClick={showModal}>
                 Thêm Question bằng Excel
               </Button>
-
               <Button
                 type="primary"
                 onClick={showModalChapter}
@@ -884,35 +930,29 @@ export default function ManageQuestionByMod() {
                   placeholder="Chọn chương"
                   onChange={handleChapterChange}
                 >
-                  {chapter.map((chapter) => (
-                    <Select.Option
-                      key={chapter.chapterId}
-                      value={chapter.chapterTitle}
-                    >
-                      {chapter.chapterTitle}
+                  {Object.keys(chapterQuestions).map((chapter, index) => (
+                    <Select.Option key={index} value={chapter}>
+                      {chapter}
                     </Select.Option>
                   ))}
                 </Select>
 
-                {dataSourceChapter && (
+                {selectedChapter && (
                   <div style={{ marginTop: 20 }}>
-                    <p>Chọn câu hỏi 1:</p>
+                    <p>Chọn câu hỏi:</p>
                     <Checkbox.Group
-                      options={dataSourceChapter.map((q) => ({
-                        label: q.questionContext,
-                        value: q.questionId,
-                      }))}
+                      options={questions.map((q) => q.questionContext)} // Hiển thị questionContext
                       onChange={handleQuestionChange}
                       style={{ display: "flex", flexDirection: "column" }}
                     />
                   </div>
                 )}
                 <div style={{ marginTop: 20 }}>
-                  <p>Các câu hỏi đã chọn 1:</p>
+                  <p>Các câu hỏi đã chọn:</p>
                   <ul>
-                    {selectedQuestions.map((question) => (
-                      <li key={question.questionId}>
-                        {question.questionContext}
+                    {selectedQuestions.map((question, index) => (
+                      <li key={index} style={{ listStyleType: "none" }}>
+                        {question.chapterTitle}: {question.questionContext}
                       </li>
                     ))}
                   </ul>
@@ -920,7 +960,7 @@ export default function ManageQuestionByMod() {
               </Modal>
               <Table
                 columns={columns}
-                dataSource={dataSource}
+                dataSource={dataSourceChapter}
                 pagination={pagination}
                 components={{
                   body: {

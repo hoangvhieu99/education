@@ -29,7 +29,6 @@ export default function PostContent({ post }) {
     postfavourites,
     countComment,
     countLike,
-    accountId
   } = post;
   const {
     getAllPost,
@@ -42,7 +41,6 @@ export default function PostContent({ post }) {
     unSavePost,
     getSavedPost,
   } = useContext(PostContext);
-  console.log(post);
   const { comments, getCommentsByPost } = useContext(CommentContext);
   const { user } = useContext(UserContext);
   const [searchParams] = useSearchParams();
@@ -121,19 +119,18 @@ export default function PostContent({ post }) {
   const handleSaveClick = async () => {
     if (user) {
       if (!userSaved) {
-        // console.log(accountId);
         await savePost(postId, user.accountId);
         openNotificationSavePostSuccess("topRight");
       } else {
         await unSavePost(postId, user.accountId);
         openNotificationUnSavePostSuccess("topRight");
       }
-     
+
       if (statusQueryParams) {
         if (statusQueryParams === "Saved") {
-          await getSavedPost(accountId);
+          await getSavedPost(user.accountId);
         } else {
-          await getPostByStatus(statusQueryParams, accountId);
+          await getPostByStatus(statusQueryParams, user.accountId);
         }
       } else {
         await getAllPost();

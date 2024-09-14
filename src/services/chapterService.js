@@ -156,3 +156,18 @@ export const AddChapterQuestionService = async (data) => {
     return e;
   }
 };
+export const AddQuestionInCourseChapterByTopic = async (data) => {
+  try {
+    const respone = await Request({
+      method: "post",
+      url: `Coursechapter/AddQuestionInCourseChapterByTopic`,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: JSON.stringify(data),
+    });
+    return respone;
+  } catch (e) {
+    return e;
+  }
+};
